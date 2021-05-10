@@ -1,8 +1,8 @@
 package com.teachpoint.Notification.controller;
 
 
+import com.teachpoint.CommonLibrary.Messages.ResponseMessage;
 import com.teachpoint.Notification.dto.OtpValidateResponse;
-import com.teachpoint.Notification.entity.Otp;
 import com.teachpoint.Notification.service.EmailService;
 import com.teachpoint.Notification.service.OtpServiceImpl;
 import org.slf4j.Logger;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -39,15 +38,15 @@ public class OTPController {
         return otpValidateResponseResponseEntity;
     }
 
-    @GetMapping("/validateOtp/{objectId}/")
-    public ResponseEntity<OtpValidateResponse> validateOTP(@PathVariable String objectId, @RequestParam Long otpnum) {
-
-        OtpValidateResponse otpValidateResponse;
+    @GetMapping("/validateOtp/{objectId}")
+    public ResponseEntity<ResponseMessage> validateOTP(@PathVariable String objectId, @RequestParam Long otpnum) {
+        System.out.println("Triggered ");
+        ResponseMessage otpValidateResponse;
         if (otpnum > 1) {
             logger.info("external otp " + otpnum);
             return otpServiceImpl.validateOtp(objectId, otpnum);
         } else {
-            otpValidateResponse = new OtpValidateResponse(-400, "Invalid OTP code");
+            otpValidateResponse = new ResponseMessage(-400, "Invalid OTP code");
             return new ResponseEntity<>(otpValidateResponse, HttpStatus.BAD_REQUEST);
         }
 

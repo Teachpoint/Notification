@@ -1,13 +1,13 @@
 package com.teachpoint.Notification.service;
 
 
+import com.teachpoint.CommonLibrary.Messages.ResponseMessage;
 import com.teachpoint.Notification.dto.OtpValidateResponse;
 import com.teachpoint.Notification.entity.Otp;
 import com.teachpoint.Notification.repository.OtpRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+
 
 @Service
 public class OtpServiceImpl implements OtpService {
@@ -64,20 +65,20 @@ public class OtpServiceImpl implements OtpService {
     }
 
 
-    public ResponseEntity<OtpValidateResponse> validateOtp(String objectId, Long otpCode){
+    public ResponseEntity<ResponseMessage> validateOtp(String objectId, Long otpCode){
        Optional<Otp> serverOtpOptional =  otpRepository.findByObjectIdAndStatusAndExpirationDateGreaterThan(objectId, 0, Instant.now());
 
        if (serverOtpOptional.isEmpty()){
-           return ResponseEntity.badRequest().body(new OtpValidateResponse(-400, "Otp code expired. Please generate new one"));
+           return ResponseEntity.badRequest().body(new ResponseMessage(-400, "Otp code expired. Please generate new one"));
        }
         Otp serverOtp = serverOtpOptional.get();
        if (otpCode == serverOtp.getOtpCode()) {
             System.out.println("SUCESSSS");
             serverOtp.setStatus(1);
             otpRepository.save(serverOtp);
-            return ResponseEntity.ok().body(new OtpValidateResponse(200, "Valid OTP code"));
+            return ResponseEntity.ok().body(new ResponseMessage(200, "Valid OTP code"));
         } else {
-            return ResponseEntity.badRequest().body(new OtpValidateResponse(-400, "Wrong OTP code. Please try again."));
+            return ResponseEntity.badRequest().body(new ResponseMessage(-400, "Wrong OTP code. Please try again."));
         }
 
     }
